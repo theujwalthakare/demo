@@ -1,95 +1,116 @@
-// Q1. Implement DFS to find paths in a city’s metro rail system using an adjacency list.
+// Q1. Implement a priority queue for a hospital emergency room, where patients with higher severity are treated first.
 #include <stdio.h>
 #include <conio.h>
-#include <stdlib.h>
 #define MAX 10
-struct node {
-    int vertex;
-    struct node *next;
+struct patient {
+    int id;
+    int severity;
 };
-struct node *adj[MAX];
-int visited[MAX];
-/* Create adjacency list node */
-struct node* createNode(int v) {
-    struct node *n;
-    n = (struct node*)malloc(sizeof(struct node));
-    n->vertex = v;
-    n->next = NULL;
-    return n;
-}
-/* Add edge (undirected graph) */
-void addEdge(int src, int dest) {
-    struct node *n;
-    n = createNode(dest);
-    n->next = adj[src];
-    adj[src] = n;
+struct patient pq[MAX];
+int count = 0;
+/* Insert patient based on priority */
+void insert(int id, int severity) {
+    int i;
+    if (count == MAX) {
+        printf("Emergency room is full!\n");
+        return;
+    }
+    i = count - 1;
+    /* Shift lower priority patients */
+    while (i >= 0 && pq[i].severity < severity) {
+        pq[i + 1] = pq[i];
+        i--;
+    }
 
-    n = createNode(src);
-    n->next = adj[dest];
-    adj[dest] = n;
+    pq[i + 1].id = id;
+    pq[i + 1].severity = severity;
+    count++;
+    printf("Patient added successfully.\n");
 }
-/* DFS traversal */
-void DFS(int v) {
-    struct node *temp;
-    visited[v] = 1;
-    printf("Station %d -> ", v);
-    temp = adj[v];
-    while (temp != NULL) {
-        if (!visited[temp->vertex])
-            DFS(temp->vertex);
-        temp = temp->next;
+/* Treat patient (delete highest priority) */
+void treat() {
+    int i;
+    if (count == 0) {
+        printf("No patients to treat.\n");
+        return;
+    }
+    printf("Treating Patient ID: %d (Severity: %d)\n",
+           pq[0].id, pq[0].severity);
+    /* Shift remaining patients */
+    for (i = 0; i < count - 1; i++) {
+        pq[i] = pq[i + 1];
+    }
+    count--;
+}
+/* Display waiting patients */
+void display() {
+    int i;
+
+    if (count == 0) {
+        printf("No patients waiting.\n");
+        return;
+    }
+    printf("\nPatientID  Severity\n");
+    for (i = 0; i < count; i++) {
+        printf("%d\t   %d\n", pq[i].id, pq[i].severity);
     }}
 void main() {
-    int vertices, edges, i, src, dest, start;
+    int choice, id, severity;
     clrscr();
-    printf("Enter number of stations: ");
-    scanf("%d", &vertices);
-    for (i = 0; i < vertices; i++) {
-        adj[i] = NULL;
-        visited[i] = 0;
-    }
-    printf("Enter number of connections: ");
-    scanf("%d", &edges);
-    for (i = 0; i < edges; i++) {
-        printf("Enter connection (src dest): ");
-        scanf("%d %d", &src, &dest);
-        addEdge(src, dest);
-    }
-    printf("Enter starting station: ");
-    scanf("%d", &start);
-    printf("\nDFS Path:\n");
-    DFS(start);
-    getch();}
-// Q1. Implement binary search to find whether a given roll number exists in a sorted list.
+    while (1) {
+        printf("\n--- Hospital Emergency Priority Queue ---\n");
+        printf("1. Add Patient\n");
+        printf("2. Treat Patient\n");
+        printf("3. Display Patients\n");
+        printf("4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                printf("Enter Patient ID: ");
+                scanf("%d", &id);
+                printf("Enter Severity (higher = more serious): ");
+                scanf("%d", &severity);
+                insert(id, severity);
+                break;
+            case 2:
+                treat();
+                break;
+            case 3:
+                display();
+                break;
+            case 4:
+                getch();
+                return;
+            default:
+                printf("Invalid choice!\n");
+        }}}
+// Q2. Store and display marks of students in multiple subjects using a 2D array.
 #include <stdio.h>
 #include <conio.h>
+#define STUDENTS 3
+#define SUBJECTS 3
 void main() {
-    int roll[10], n, key;
-    int low, high, mid, i;
+    int marks[STUDENTS][SUBJECTS];
+    int i, j;
     clrscr();
-    printf("Enter number of students: ");
-    scanf("%d", &n);
-    printf("Enter roll numbers in sorted order:\n");
-    for (i = 0; i < n; i++) {
-        scanf("%d", &roll[i]);
-    }
-    printf("Enter roll number to search: ");
-    scanf("%d", &key);
-    low = 0;
-    high = n - 1;
-    while (low <= high) {
-        mid = (low + high) / 2;
-        if (roll[mid] == key) {
-            printf("Roll number %d FOUND at position %d\n", key, mid + 1);
-            getch();
-            return;
+    // Input marks
+    for(i=0; i<STUDENTS; i++) {
+        printf("Enter marks for Student %d:\n", i+1);
+        for(j=0; j<SUBJECTS; j++) {
+            printf("  Subject %d: ", j+1);
+            scanf("%d", &marks[i][j]);
         }
-        else if (roll[mid] < key)
-            low = mid + 1;
-        else
-            high = mid - 1;
     }
-    printf("Roll number %d NOT FOUND\n", key);
-    getch();}
-
+    // Display marks
+    printf("\n--- Marks of Students ---\n");
+    for(i=0; i<STUDENTS; i++) {
+        printf("Student %d: ", i+1);
+        for(j=0; j<SUBJECTS; j++) {
+            printf("%d ", marks[i][j]);
+        }
+        printf("\n");
+    }
+getch();
+}
 

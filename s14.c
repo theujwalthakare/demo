@@ -1,132 +1,119 @@
-// 1
-
+Q1. Implement the Insertion Sort algorithm to sort student names in ascending order.
 #include <stdio.h>
+#include <conio.h>
 #include <string.h>
-int main()
-{
-int n, i, j;
-char names[50][50], key[50];
-printf("Enter number of students: ");
-scanf("%d", &n);
-printf("Enter student names:\n");
-for (i = 0; i < n; i++)
-{
-scanf("%s", names[i]);
-}
-// Insertion Sort
-for (i = 1; i < n; i++)
-{
-strcpy(key, names[i]);
-j = i - 1;
-while (j >= 0 && strcmp(names[j], key) > 0)
-{
-strcpy(names[j + 1], names[j]);
-j--;
-}
-strcpy(names[j + 1], key);
-}
-printf("\nStudent names in ascending order:\n");
-for (i = 0; i < n; i++)
-{
-printf("%s\n", names[i]);
-}
-return 0;
-}
-
-// 2
-
-
-// 2
+#define MAX 10
+#define LEN 30
+void main() {
+    char names[MAX][LEN], temp[LEN];
+    int n, i, j;
+    clrscr();
+    printf("Enter number of students: ");
+    scanf("%d", &n);
+    printf("Enter student names:\n");
+    for (i = 0; i < n; i++) {
+        scanf("%s", names[i]);
+    }
+    /* Insertion Sort Logic */
+    for (i = 1; i < n; i++) {
+        strcpy(temp, names[i]);
+        j = i - 1;
+        while (j >= 0 && strcmp(names[j], temp) > 0) {
+            strcpy(names[j + 1], names[j]);
+            j--;
+        }
+        strcpy(names[j + 1], temp);
+    }
+    printf("\nSorted Student Names (Ascending Order):\n");
+    for (i = 0; i < n; i++) {
+        printf("%s\n", names[i]);
+    }
+    getch();}
+Q2. Develop a BST to store and search for student records based on roll numbers.
 #include <stdio.h>
+#include <conio.h>
 #include <stdlib.h>
 #include <string.h>
-#include<conio.h>
-typedef struct Student {
-int roll;
-char name[50];
-float marks;
-} Std;
-typedef struct Node {
-Std data;
-struct Node *left;
-struct Node *right;
-}NODE;
-NODE* create(Std s)
-{
-NODE* newnode = (NODE*) malloc(sizeof(NODE));
-newnode->data = s;
-newnode->left = newnode->right = NULL;
-return newnode;
+struct node {
+    int roll;
+    char name[30];
+    struct node *left, *right;
+};
+/* Create new BST node */
+struct node* createNode(int roll, char name[]) {
+    struct node *n;
+    n = (struct node*)malloc(sizeof(struct node));
+    n->roll = roll;
+    strcpy(n->name, name);
+    n->left = n->right = NULL;
+    return n;
 }
-NODE *insert(NODE *root,Std s)
-{
-if(root==NULL)
-return create(s);
-if(s.roll<root->data.roll)
-root->left=insert(root->left,s);
-else
-root->right=insert(root->right,s);
-return root;
+/* Insert node into BST */
+struct node* insert(struct node *root, int roll, char name[]) {
+    if (root == NULL)
+        return createNode(roll, name);
+    if (roll < root->roll)
+        root->left = insert(root->left, roll, name);
+    else if (roll > root->roll)
+        root->right = insert(root->right, roll, name);
+    return root;
 }
-NODE* search(NODE* root, int roll)
-{
-if (root == NULL || root->data.roll == roll)
-return root;
-if (roll < root->data.roll)
-return search(root->left, roll);
-return search(root->right, roll);
+/* Search student by roll number */
+void search(struct node *root, int roll) {
+    if (root == NULL) {
+        printf("Student record NOT FOUND\n");
+        return;
+    }
+    if (root->roll == roll) {
+        printf("Student FOUND\n");
+        printf("Roll No: %d\nName: %s\n", root->roll, root->name);
+    }
+    else if (roll < root->roll)
+        search(root->left, roll);
+    else
+        search(root->right, roll);
 }
-void inorder(NODE *root)
-{
-if(root!=NULL)
-{
-inorder(root->left);
-printf("Roll:%d | Name:%s | Marks:%2f \n",
-root->data.roll,root->data.name,root->data.marks);
-inorder(root->right);
-}
-}
-void main()
-{
-NODE *root=NULL;
-Std s;
-int ch,roll;
-NODE *result;
-clrscr();
-do{
-printf("1:Insert Student\n2:Search Student\n3:Display Student\n4:Exit\n");
-printf("Enter your choice:");
-scanf("%d",&ch);
-switch(ch)
-{
-case 1:printf("Enter Roll Number:");
-scanf("%d",&s.roll);
-printf("Enter Name:");
-scanf("%s",s.name);
-printf("Enter marks:");
-scanf("%f",&s.marks);
-root=insert(root,s);
-printf("Student Record Inserted succesfully!!\n");
-break;
-case 2:printf("Enter Roll Number to Search: ");
-scanf("%d", &roll);
-result = search(root, roll);
-if (result != NULL)
-{
-printf("Record Found!\n");
-printf("Roll: %d | Name: %s | Marks: %.2f\n",
-result->data.roll, result->data.name, result->data.marks);
-}
-else
-{
-printf("Student not found!\n");
-}
-break;
-case 3:printf("------Student Details Are----\n");
-inorder(root);
-break;
-case 4:exit(0);
-}
-}while(ch!=4);
-getch();
-}
+/* Inorder traversal (display records) */
+void inorder(struct node *root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d  %s\n", root->roll, root->name);
+        inorder(root->right);
+    }}
+void main() {
+    struct node *root = NULL;
+    int choice, roll;
+    char name[30];
+    clrscr();
+    while (1) {
+        printf("\n--- Student Record BST ---\n");
+        printf("1. Insert Student\n");
+        printf("2. Search Student\n");
+        printf("3. Display All (Inorder)\n");
+        printf("4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                printf("Enter Roll Number: ");
+                scanf("%d", &roll);
+                printf("Enter Name: ");
+                scanf("%s", name);
+                root = insert(root, roll, name);
+                break;
+            case 2:
+                printf("Enter Roll Number to Search: ");
+                scanf("%d", &roll);
+                search(root, roll);
+                break;
+            case 3:
+                printf("\nRoll  Name\n");
+                inorder(root);
+                break;
+            case 4:
+                getch();
+                return;
+            default:
+                printf("Invalid choice!\n");
+        }}}
+

@@ -1,128 +1,162 @@
-
-// Q1
+// Q1. Create an array to store student names in a class, allowing insertion, deletion, and traversal operations.
 #include <stdio.h>
 #include <string.h>
 #define MAX 100
-char students[MAX][50];
-int count = 0;
-void insertStudent() {
-if (count < MAX) {
-printf("Enter student name: ");
-scanf("%s", students[count]);
-count++;
-printf("Student added successfully.\n");
-} else {
-printf("Class is full. Cannot add more students.\n");
-}
-}
-void deleteStudent() {
-if (count > 0) {
-count--;
-printf("Student removed successfully.\n");
-} else {
-printf("No students to remove.\n");
-}
-}
-void displayStudents() {
-int i;
-if (count > 0) {
-printf("Student Names:\n");
-for (i = 0; i < count; i++) {
-printf("%d. %s\n", i + 1, students[i]);
-}
-} else {
-printf("No students to display.\n");
-}
-}
+#define NAME_LEN 50
+void insert(char students[][NAME_LEN], int *n, char name[]);
+void delete(char students[][NAME_LEN], int *n, int pos);
+void traverse(char students[][NAME_LEN], int n);
 int main() {
-int choice;
-do {
-printf("\nMenu:\n");
-printf("1. Add Student\n");
-printf("2. Remove Student\n");
-printf("3. Display Students\n");
-printf("4. Exit\n");
-printf("Enter your choice: ");
-scanf("%d", &choice);
-switch (choice) {
-case 1:
-insertStudent();
-break;
-case 2:
-deleteStudent();
-break;
-case 3:
-displayStudents();
-break;
-case 4:
-printf("Exiting program.\n");
-break;
-default:
-printf("Invalid choice. Please try again.\n");
+    char students[MAX][NAME_LEN];
+    int n = 0, choice, pos;
+    char name[NAME_LEN];
+    while (1) {
+        printf("\n--- Student Management Menu ---\n");
+        printf("1. Insert Student\n");
+        printf("2. Delete Student\n");
+        printf("3. Traverse Students\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar();
+        switch (choice) {
+            case 1:
+                if (n >= MAX) {
+                    printf("Class is full!\n");
+                } else {
+                    printf("Enter student name: ");
+                    fgets(name, NAME_LEN, stdin);
+                    name[strcspn(name, "\n")] = '\0';
+                    insert(students, &n, name);
+              }
+                break;
+            case 2:
+                if (n == 0) {
+                    printf("No students to delete!\n");
+                } else {
+                    printf("Enter position to delete (1-%d): ", n);
+                    scanf("%d", &pos);
+                    if (pos < 1 || pos > n) {
+                        printf("Invalid position!\n");
+                    } else {
+                        delete(students, &n, pos);
+                    }
+                }
+                break;
+            case 3:
+                traverse(students, n);
+                break;
+            case 4:
+                return 0;
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
 }
-} while (choice != 4);
-getch();
-return 0;
+void insert(char students[][NAME_LEN], int *n, char name[]) {
+    strcpy(students[*n], name);
+    (*n)++;
+    printf("Student added successfully.\n");
 }
-
-// Q2
-#include <stdio.h>
+void delete(char students[][NAME_LEN], int *n, int pos) {
+    int i;
+    for (i = pos - 1; i < *n - 1; i++) {
+        strcpy(students[i], students[i + 1]);
+    }
+    (*n)--;
+    printf("Student deleted successfully.\n");
+}
+void traverse(char students[][NAME_LEN], int n) {
+    int i;
+    if (n == 0) {
+        printf("No students in the class.\n");
+    } else {
+        for (i = 0; i < n; i++) {
+           printf("%d. %s\n", i + 1, students[i]);
+     }}}
+// Q2. Write a program to store a sequence of train stations in a singly linked list and reverse the order to simulate a return journey.
+  #include <stdio.h>
+#include <conio.h>
 #include <stdlib.h>
 #include <string.h>
-#include<conio.h>
-typedef struct train {
-char data[20];
-struct train *next;
-} NODE;
-NODE *head = NULL;
-void create() {
-int n, i;
-NODE *temp;
-printf("Enter Number of Trains: ");
-scanf("%d", &n);
-head = (NODE*)malloc(sizeof(NODE));
-printf("Enter Train 1 Name: ");
-scanf("%s", head->data);
-temp = head;
-for (i = 1; i < n; i++) {
-temp->next = (NODE*)malloc(sizeof(NODE));
-temp=temp->next;
-printf("Enter Train %d Name: ", i + 1);
-scanf("%s", temp->data);
+struct node {
+    char station[50];
+    struct node *next;
+};
+struct node *head = NULL;
+/* Function to insert station at end */
+void insertStation(char name[]) {
+    struct node *newNode, *temp;
+    newNode = (struct node *)malloc(sizeof(struct node));
+    strcpy(newNode->station, name);
+    newNode->next = NULL;
+    if (head == NULL) {
+        head = newNode;
+    } else {
+        temp = head;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = newNode;
+    }
 }
-temp->next = NULL;
-}
+/* Function to display stations */
 void display() {
-NODE *temp = head;
-if (temp == NULL) {
-printf("No trains in the list.\n");
-return;
+    struct node *temp;
+    if (head == NULL) {
+        printf("No stations available.\n");
+        return;
+    }
+    temp = head;
+    while (temp != NULL) {
+        printf("%s -> ", temp->station);
+        temp = temp->next;
+    }
+    printf("NULL\n");
 }
-printf("\nTrain List:\n");
-while (temp != NULL) {
-printf("%s -> ", temp->data);
-temp = temp->next;
+/* Function to reverse linked list */
+void reverse() {
+    struct node *prev = NULL, *curr = head, *nextNode;
+    while (curr != NULL) {
+        nextNode = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = nextNode;
+    }
+    head = prev;
+    printf("Journey reversed successfully.\n");
 }
-printf("NULL\n");
+void main() {
+    int choice;
+    char name[50];
+    clrscr();
+    while (1) {
+        printf("\n--- Train Journey Menu ---\n");
+        printf("1. Add Station\n");
+        printf("2. Display Journey\n");
+        printf("3. Reverse Journey (Return Trip)\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                printf("Enter station name: ");
+                scanf("%s", name);
+                insertStation(name);
+                break;
+            case 2:
+                printf("Train Route:\n");
+                display();
+               break;
+            case 3:
+                reverse();
+                break;
+
+            case 4:
+                getch();
+                exit(0);
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
 }
-void reverse()
-{
-NODE *prev = NULL;
-NODE *temp = head;
-NODE *next = NULL;
-while (temp != NULL) {
-next = temp->next;
-temp->next = prev;
-prev =temp;
-temp = next;
-}
-head = prev;
-printf("\nReversed Train List:\n");
-display();
-}
-int main() {
-create();
-display();
-reverse();
-getch();
-return 0;}
+

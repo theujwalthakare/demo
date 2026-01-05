@@ -1,160 +1,81 @@
-#include<stdio.h>
-#include<conio.h>
-#include<string.h>
-#include<stdlib.h>
-typedef struct song
-{
-char song[50];
-struct song *next;
-struct song *prev;
-}NODE;
-NODE *head=NULL;
-void create()
-{
-int i,n;
-NODE *temp,*newnode;
-printf("Enter Number of Songs:");
-scanf("%d",&n);
-head=(NODE *)malloc(sizeof(NODE));
-head->prev=NULL;
-printf("ENter Song 1:");
-scanf("%s",head->song);
-temp=head;
-for(i=1;i<n;i++)
-{
-temp->next=(NODE *)malloc(sizeof(NODE));
-temp->next->prev=temp;
-temp=temp->next;
-printf("Enter %d song:",i+1);
-scanf("%s",temp->song);
+Q1. Implement a music playlist where songs can be played forward and backward using a doubly linked list.
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+#include <string.h>
+struct node {
+    char song[50];
+    struct node *next, *prev;
+} *head=NULL, *tail=NULL;
+void addSong(char *name) {
+    struct node *n = (struct node*)malloc(sizeof(struct node));
+    strcpy(n->song, name);
+    n->next = NULL;
+    n->prev = tail;
+    if (!head) head = n;
+    else tail->next = n;
+    tail = n;
 }
-temp->next=NULL;
+void playForward() {
+    struct node *t = head;
+    if (!t) { printf("Playlist empty!\n"); return; }
+    while (t) { printf("%s -> ", t->song); t = t->next; }
+    printf("END\n");
 }
-void display()
-{
-NODE *temp=head;
-if(head==NULL)
-{
-printf("The playlist is empty:\n");
-return;
+void playBackward() {
+    struct node *t = tail;
+   if (!t) { printf("Playlist empty!\n"); return; }
+    while (t) { printf("%s -> ", t->song); t = t->prev; }
+    printf("START\n");
 }
-printf("Song List is:\n");
-while(temp!=NULL)
-{
-printf("%s\n",temp->song);
-temp=temp->next;
+void main() {
+    int ch;
+    char name[50];
+    clrscr();
+    while (1) {
+        printf("\n1.Add Song 2.Play Forward 3.Play Backward 4.Exit\nChoice: ");
+        scanf("%d", &ch);
+        switch (ch) {
+            case 1:
+                printf("Enter song name: ");
+                scanf("%s", name);
+                addSong(name);
+                break;
+            case 2: playForward(); break;
+            case 3: playBackward(); break;
+            case 4: exit(0);
+            default: printf("Invalid choice!\n");
+        }
+    }
 }
-printf("\n\n");
-}
-void forward()
-{
-NODE *temp=head;
-if(head==NULL)
-{
-printf("The playlist is empty:\n");
-return;
-}
-printf("Playing songs->:\n");
-while(temp!=NULL)
-{
-printf("%s->",temp->song);
-temp=temp->next;
-}
-printf("\n\n");
-}
-void backword()
-{
-NODE *temp=head;
-if(head==NULL)
-{
-printf("The playlist is empty:\n");
-return;
-}
-printf("Playing songs in<-:\n");
-while(temp->next!=NULL)
-{
-temp=temp->next;
-}
-while(temp!=NULL)
-{
-printf("%s->",temp->song);
-temp=temp->prev;
-}
-printf("\n\n");
-}
-int main()
-{
-int ch;
-do
-{
-printf("-----MENU-----\n");
-printf("1:create playlist\n2:display list\n3:forward\n4:backword\n5:exit\n");
-printf("Enter choice:");
-scanf("%d",&ch);
-switch(ch)
-{
-case 1:create();
-break;
-case 2:display();
-break;
-case 3:forward();
-break;
-case 4:backword();
-break;
-case 5:break;
-}
-}while(ch!=5);
+Q2. Store and display marks of students in multiple subjects using a 2D array.
+#include <stdio.h>
+#include <conio.h>
+#define STUDENTS 3
+#define SUBJECTS 3
+void main() {
+    int marks[STUDENTS][SUBJECTS];
+    int i, j;
+    clrscr();
+    // Input marks
+    for(i=0; i<STUDENTS; i++) {
+        printf("Enter marks for Student %d:\n", i+1);
+        for(j=0; j<SUBJECTS; j++) {
+            printf("  Subject %d: ", j+1);
+            scanf("%d", &marks[i][j]);
+        }
+    }
+    // Display marks
+    printf("\n--- Marks of Students ---\n");
+    for(i=0; i<STUDENTS; i++) {
+        printf("Student %d: ", i+1);
+        for(j=0; j<SUBJECTS; j++) {
+            printf("%d ", marks[i][j]);
+        }
+        printf("\n");
+    }
 getch();
-return 0;
 }
 
-// 2
-#include <stdio.h>
-#include <string.h>
-#define max 50
-void main()
-{
-int i, j, students, subjects;
-char names[max][50];
-int marks[max][max];
-float total[max], average[max];
-int topperIndex = 0;
-printf("Enter number of students: ");
-scanf("%d", &students);
-printf("Enter number of subjects: ");
-scanf("%d", &subjects);
-// Input student names and their marks
-printf("Enter student names and their marks:\n");
-for (i = 0; i < students; i++)
-{
-total[i] = 0; // Initialize total marks for each student
-printf("Student %d name: ", i + 1);
-scanf("%s", names[i]);
-for (j = 0; j < subjects; j++)
-{
-printf("Subject %d marks: ", j + 1);
-scanf("%d", &marks[i][j]);
-total[i] += marks[i][j]; // Add marks to total
-}
-average[i] = total[i] / subjects; // Calculate average
-if (average[i] > average[topperIndex])
-topperIndex = i; // Update topper index
-}
-printf("\nMarks of students:\n");
-printf("Name\t");
-for (j = 0; j < subjects; j++)
-{
-printf("Sub%d\t", j + 1);
-}
-printf("Total\tAverage\n");
-for (i = 0; i < students; i++)
-{
-printf("%s\t", names[i]);
-for (j = 0; j < subjects; j++)
-{
-printf("%d\t", marks[i][j]);
-}
-printf("%.2f\t%.2f\n", total[i], average[i]);
-}
-printf("\nTopper: %s with Average Marks: %.2f\n", names[topperIndex], average[topperIndex]);
-}
+
+

@@ -1,202 +1,134 @@
+Q1. Implement a stack-based text editor feature that supports undo/redo operations.
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include<conio.h>
-#define SIZE 100
-#define MAX_TEXT 100
-typedef struct
-{
-char items[SIZE][MAX_TEXT];
-int top;
-} Stack;
-void initstack(Stack *s)
-{
-s->top = -1;
-}
-int isfull(Stack *s)
-{
-return s->top == SIZE - 1;
-}
-int isempty(Stack *s)
-{
-return s->top == -1;
-}
-void push(Stack *s, const char *text)
-{
-if (isfull(s))
-{
-printf("Stack is full\n");
-return;
-}
-strcpy(s->items[++(s->top)], text);
-}
-int *pop(Stack *s)
-{
-if (isempty(s))
-{
-printf("Stack is empty\n");
-return ;
-}
-return s->items[(s->top)--];
-}
-int peek(Stack *s)
-{
-if (isempty(s))
-{
-printf("Stack is empty\n");
-return -1;
-}
-return s->items[s->top];
-}
-int main()
-{
-Stack undoStack, redoStack;
-char currentText[MAX_TEXT] = "";
-char input[MAX_TEXT];
-int choice;
-initstack(&undoStack);
-initstack(&redoStack);
-while (1)
-{
-printf("\nCurrent Text: %s\n", currentText);
-printf("1. Type Text\n2. Undo\n3. Redo\n4. Exit\n");
-printf("Enter your choice: ");
-scanf("%d", &choice);
-getchar(); // to consume newline character
-switch (choice)
-{
-case 1:
-push(&undoStack, currentText);
-initstack(&redoStack); // Clear redo stack
-printf("Enter text to append: ");
-fgets(input, MAX_TEXT, stdin);
-input[strcspn(input, "\n")] = 0; // Remove newline character
-strcat(currentText, input);
-break;
-case 2:{
-if (isempty(&undoStack))
-{
-printf("Nothing to undo\n");
-}
-else
-{
-push(&redoStack, currentText);
-strcpy(currentText, pop(&undoStack));
-}
-break;
-}
-case 3:
-if (isempty(&redoStack))
-{
-printf("Nothing to redo\n");
-}
-else
-{
-push(&undoStack, currentText);
-strcpy(currentText, pop(&redoStack));
-}
-break;
-case 4:
-exit(0);
-default:
-printf("Invalid choice\n");
-}
-}
-getch();
-return 0;
-}
-
-
-// 2
-  
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <conio.h>
-#define MAX 100
-typedef struct
-{
-char items[MAX];
-int top;
-} Stack;
-void initstack(Stack *s)
-{
-s->top = -1;
+#include <string.h>
+#define MAX 10
+#define SIZE 100
+char undoStack[MAX][SIZE];
+char redoStack[MAX][SIZE];
+int undoTop = -1, redoTop = -1;
+char text[SIZE] = "";
+/* Push to undo stack */
+void pushUndo(char str[]) {
+    if (undoTop < MAX - 1) {
+        undoTop++;
+        strcpy(undoStack[undoTop], str);
+    }
 }
-int isfull(Stack *s)
-{
-return s->top == MAX - 1;
+/* Push to redo stack */
+void pushRedo(char str[]) {
+    if (redoTop < MAX - 1) {
+        redoTop++;
+        strcpy(redoStack[redoTop], str);
+    }
 }
-int isempty(Stack *s)
-{
-return s->top == -1;
+/* Pop from undo stack */
+int popUndo(char str[]) {
+    if (undoTop >= 0) {
+        strcpy(str, undoStack[undoTop]);
+        undoTop--;
+        return 1;
+    }
+    return 0;
 }
-void push(Stack *s, char c)
-{
-if (isfull(s ))
-{
-printf("Stack is full\n");
-return;
+/* Pop from redo stack */
+int popRedo(char str[]) {
+    if (redoTop >= 0) {
+        strcpy(str, redoStack[redoTop]);
+        redoTop--;
+        return 1;
+    }
+    return 0;
 }
-s->items[++(s->top)] = c;
+/* Clear redo stack after new edit */
+void clearRedo() {
+    redoTop = -1;
 }
-char pop(Stack *s)
-{
-if (isempty(s))
-{
-printf("Stack is empty\n");
-return NULL;
+void main() {
+    int choice;
+    char newText[SIZE];
+    clrscr();
+    while (1) {
+        printf("\n--- Stack Based Text Editor ---\n");
+        printf("Current Text: \"%s\"\n", text);
+        printf("1. Edit Text\n");
+        printf("2. Undo\n");
+        printf("3. Redo\n");
+        printf("4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                pushUndo(text);   /* Save current state */
+                clearRedo();      /* Clear redo after edit */
+                printf("Enter new text: ");
+                scanf("%s", newText);
+                strcpy(text, newText);
+                break;
+            case 2:
+                if (popUndo(newText)) {
+                    pushRedo(text);
+                    strcpy(text, newText);
+                    printf("Undo successful.\n");
+                } else {
+                    printf("Nothing to undo.\n");
+                }
+                break;
+            case 3:
+                if (popRedo(newText)) {
+                    pushUndo(text);
+                    strcpy(text, newText);
+                    printf("Redo successful.\n");
+                } else {
+                    printf("Nothing to redo.\n");
+                }
+                break;
+            case 4:
+                getch();
+                return;
+            default:
+                printf("Invalid choice!\n");
+        }}}
+
+
+Q2. Use the stack ADT to check whether parentheses in an arithmetic expression are balanced.
+#include <stdio.h>
+#include <conio.h>
+#include <string.h>
+#define MAX 50
+char stack[MAX];
+int top = -1;
+/* Push operation */
+void push(char ch) {
+    if (top < MAX - 1)
+        stack[++top] = ch;
 }
-return s->items[(s->top)--];
+/* Pop operation */
+char pop() {
+    if (top >= 0)
+        return stack[top--];
+    return '\0';
 }
-int matching(char open, char close)
-{
-return (open == '(' && close == ')') ||
-(open == '{' && close == '}') ||
-(open == '[' && close == ']');
-}
-int balanced(const char *expr)
-{
-Stack s;
-int i;
-char popped;
-initstack(&s);
-for ( i = 0; expr[i] != '\0'; i++)
-{
-char c = expr[i];
-if (c == '(' || c == '{' || c == '[')
-{
-push(&s, c);
-}
-else if (c == ')' || c == '}' || c == ']')
-{
-if (isempty(&s) )
-{
-return 0; // Not balanced
-}
-popped = pop(&s);
-if (!matching(popped, c))
-{
-return 0; // Not balanced
-}
-}
-}
-return isempty(&s); // Balanced if stack is empty
-}
-int main()
-{
-char expr[MAX];
-printf("Enter an arithmetic expression: ");
-scanf("%s", expr);
-// Remove newline character if present
-if (balanced(expr))
-{
-printf("The parentheses are balanced.\n");
-}
-else
-{
-printf("The parentheses are not balanced.\n");
-}
-getch();
-return 0;
-}
+void main() {
+    char exp[MAX];
+    int i, flag = 1;
+    clrscr();
+    printf("Enter expression: ");
+    scanf("%s", exp);
+    for (i = 0; exp[i] != '\0'; i++) {
+        if (exp[i] == '(') {
+            push('(');
+        } else if (exp[i] == ')') {
+            if (top == -1) {
+                flag = 0;
+                break;
+            }
+            pop();
+        }}
+    if (top != -1)
+        flag = 0;
+    if (flag)
+        printf("Parentheses are BALANCED\n");
+    else
+        printf("Parentheses are NOT BALANCED\n");
+    getch();}
